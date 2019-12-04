@@ -165,7 +165,7 @@
             "[variables('webSiteName')]"
           ],
           "properties": {
-            "DefaultConnection": {
+            "DatabaseConnectionString": {
               "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('databaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]",
               "type": "SQLAzure"
             }

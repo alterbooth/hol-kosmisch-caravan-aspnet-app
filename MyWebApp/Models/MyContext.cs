@@ -15,7 +15,7 @@ namespace MyWebApp.Models
         // For more information refer to the documentation:
         // http://msdn.microsoft.com/en-us/data/jj591621.aspx
     
-        public MyContext() : base("name=MyContext")
+        public MyContext() : base("name=DatabaseConnectionString")
         {
         }
 
