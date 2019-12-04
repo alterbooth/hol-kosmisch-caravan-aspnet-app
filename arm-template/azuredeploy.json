@@ -56,7 +56,7 @@
     "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
     "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
     "databaseName": "sampledb",
-    "databaseBacpacUrl": "https://github.com/alterbooth/hol-kosmisch-caravan-aspnet-app/deploy-aspnet-app-to-azure/backup/sql-database-sample.bacpac"
+    "databaseBacpacUrl": "https://github.com/alterbooth/hol-kosmisch-caravan-aspnet-app/raw/master/arm-template/sql-database-sample.bacpac"
   },
   "resources": [
     {
