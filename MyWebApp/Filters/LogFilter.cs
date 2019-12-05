@@ -12,7 +12,7 @@ namespace MyWebApp.Filters
         public void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var req = filterContext.HttpContext.Request;
-            Trace.WriteLine($"Action Executing.|Method={req.HttpMethod}|Path={req.Path}");
+            Trace.WriteLine($"Action Executing.|Path={req.Path}");
         }
     }
 }
