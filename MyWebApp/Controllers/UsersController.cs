@@ -1,12 +1,13 @@
-﻿using MyWebApp.Helpers;
-using MyWebApp.Models;
+﻿using MyWebApp.Models;
 using System;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 
-namespace MyWebApp.Areas.Admin.Controllers
+namespace MyWebApp.Controllers
 {
     public class UsersController : Controller
     {
@@ -44,29 +45,26 @@ namespace MyWebApp.Areas.Admin.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Name,Age,ProfileFileName")] User user)
+        public ActionResult Create([Bind(Include = "Name,Age,ProfileFileName")] User user)
         {
             if (!ModelState.IsValid)
             {
                 return View(user);
             }
 
-            var file = Request.Files["profile"];
+            HttpPostedFileBase file = Request.Files["profile"];
             if (file != null && file.ContentLength > 0)
             {
-                var path = HttpContext.Server.MapPath("~/temp/");
-                FileHelper.Create(path, file);
-                user.ProfileFileName = file.FileName;
+                user.ProfileFileName = SaveFile(file);
             }
 
-            user.Id = Guid.NewGuid();
             db.Users.Add(user);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         // GET: Users/Edit/5
-        public ActionResult Edit(Guid? id)
+        public ActionResult Edit(int? id)
         {
             if (id == null)
             {
@@ -92,12 +90,10 @@ namespace MyWebApp.Areas.Admin.Controllers
                 return View(user);
             }
 
-            var file = Request.Files["profile"];
-            if (file != null && file.ContentLength > 0 && file.FileName != user.ProfileFileName)
+            HttpPostedFileBase file = Request.Files["profile"];
+            if (file != null && file.ContentLength > 0)
             {
-                var path = HttpContext.Server.MapPath("~/temp/");
-                FileHelper.Create(path, file);
-                user.ProfileFileName = file.FileName;
+                user.ProfileFileName = SaveFile(file);
             }
 
             db.Entry(user).State = EntityState.Modified;
@@ -112,6 +108,16 @@ namespace MyWebApp.Areas.Admin.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private string SaveFile(HttpPostedFileBase file)
+        {
+            string dirPath = HttpContext.Server.MapPath("~/temp/");
+            Directory.CreateDirectory(dirPath);
+
+            string fileName = new FileInfo(file.FileName).Name;
+            file.SaveAs($"{dirPath}{fileName}");
+            return $"/temp/{fileName}";
         }
     }
 }

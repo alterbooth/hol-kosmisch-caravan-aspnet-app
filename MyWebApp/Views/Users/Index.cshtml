@@ -39,7 +39,7 @@
             @Html.DisplayFor(modelItem => item.Age)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.ProfileFileName)
+            <img src="@item.ProfileFileName" height="80" width="80" />
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

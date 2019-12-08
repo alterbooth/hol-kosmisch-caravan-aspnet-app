@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var profileFilePath = $@"/temp/{Model.ProfileFileName}";
 }
 
 <h2>Details</h2>
@@ -43,7 +42,7 @@
             </dt>
 
             <dd>
-                <img src="@profileFilePath" height="80" width="80" />
+                <img src="@Model.ProfileFileName" height="80" width="80" />
             </dd>
         }
 
