@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using MyWebApp.Models;
 using System.Web.Mvc;
 
 namespace MyWebApp.Controllers
@@ -10,21 +7,15 @@ namespace MyWebApp.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            string message = Session["message"]?.ToString() ?? "";
+            return View(new MyForm { Message = message });
         }
 
-        public ActionResult About()
+        [HttpPost]
+        public ActionResult Index(MyForm item)
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            Session["message"] = item.Message;
+            return RedirectToAction("Index");
         }
     }
 }
