@@ -154,6 +154,7 @@
       },
       "properties": {
         "name": "[variables('webSiteName')]",
+        "clientAffinityEnabled": false,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
       },
       "resources": [
