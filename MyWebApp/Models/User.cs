@@ -5,7 +5,8 @@ namespace MyWebApp.Models
 {
     public class User
     {
-        public Guid Id { get; set; }
+        [Key]
+        public int Id { get; set; }
         [Display(Name = "氏名")]
         public string Name { get; set; }
         [Display(Name = "年齢")]

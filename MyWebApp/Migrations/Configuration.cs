@@ -1,4 +1,4 @@
-namespace MyWebApp.Migrations
+namespace HolKosmischCaravanAspnetApp.Migrations
 {
     using System;
     using System.Data.Entity;

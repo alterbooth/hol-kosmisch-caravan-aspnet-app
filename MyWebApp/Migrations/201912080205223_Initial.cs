@@ -1,4 +1,4 @@
-namespace MyWebApp.Migrations
+namespace HolKosmischCaravanAspnetApp.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -11,7 +11,7 @@ namespace MyWebApp.Migrations
                 "dbo.Users",
                 c => new
                     {
-                        Id = c.Guid(nullable: false),
+                        Id = c.Int(nullable: false, identity: true),
                         Name = c.String(),
                         Age = c.Int(nullable: false),
                         ProfileFileName = c.String(),
