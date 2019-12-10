@@ -14,7 +14,10 @@ namespace MyWebApp.Controllers
         [HttpPost]
         public ActionResult Index(MyForm item)
         {
-            Session["message"] = item.Message;
+            if (!string.IsNullOrWhiteSpace(item?.Message))
+            {
+                Session["message"] = item.Message;
+            }
             return RedirectToAction("Index");
         }
     }
