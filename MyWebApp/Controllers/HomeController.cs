@@ -7,8 +7,8 @@ namespace MyWebApp.Controllers
     {
         public ActionResult Index()
         {
-            string message = Session["message"]?.ToString() ?? "";
-            return View(new MyForm { Message = message });
+            ViewBag.Message = Session["message"]?.ToString() ?? "";
+            return View();
         }
 
         [HttpPost]

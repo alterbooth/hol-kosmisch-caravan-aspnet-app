@@ -3,7 +3,7 @@
     ViewBag.Title = "Home Page";
 }
 
-<h2>あなたへのメッセージ：@Model.Message</h2>
+<h2>あなたへのメッセージ：@ViewBag.Message</h2>
 @using (Html.BeginForm("Index", "Home", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
