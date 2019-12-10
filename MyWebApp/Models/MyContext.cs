@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data.Entity;
 
 namespace MyWebApp.Models
 {
@@ -18,7 +14,5 @@ namespace MyWebApp.Models
         public MyContext() : base("name=DatabaseConnectionString")
         {
         }
-
-        public System.Data.Entity.DbSet<MyWebApp.Models.User> Users { get; set; }
     }
 }
