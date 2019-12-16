@@ -41,10 +41,7 @@
   },
   "variables": {
     "hostingPlanName": "[concat('hostingplan', uniqueString(resourceGroup().id))]",
-    "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-    "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
-    "databaseName": "sampledb",
-    "databaseBacpacUrl": "https://kosmischcaravan.blob.core.windows.net/dbbackup/sql-database-sample.bacpac"
+    "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
