@@ -1,0 +1,161 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: KOSMISCH asp.net sample app
+ 
+Mappings:
+  StackConfig:
+    EC2:
+      ImageId: 'ami-0f2844eaec255ac26'
+ 
+Resources:
+  KosmischVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '192.168.0.0/16'
+      Tags:
+        - Key: 'Name'
+          Value: 'kosmisch-vpc'
+  KosmischSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      # AZの指定
+      AvailabilityZone: 'ap-northeast-1a'
+      CidrBlock: '192.168.1.0/24'
+      # public IPの指定
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'kosmisch-sub1'
+      VpcId: !Ref KosmischVPC
+  KosmischSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      # AZの指定
+      AvailabilityZone: 'ap-northeast-1c'
+      CidrBlock: '192.168.2.0/24'
+      # public IPの指定
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'kosmisch-sub1'
+      VpcId: !Ref KosmischVPC
+  # Internet Gateway
+  KosmischInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: 'Name'
+          Value: 'kosmisch-igw'
+  # igwをvpcにアタッチ
+  IgwAttache:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref KosmischInternetGateway
+      VpcId: !Ref KosmischVPC
+  # Public Route Table
+  KosmischPublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref KosmischVPC
+      Tags:
+        - Key: 'Name'
+          Value: 'kosmisch-public-rtb'
+  # Public Route Tableを編集
+  ChangePublicRouteTable:
+    Type: AWS::EC2::Route
+    # IgwAttache 実行後に設定する
+    DependsOn: 'IgwAttache'
+    Properties:
+      RouteTableId: !Ref KosmischPublicRouteTable
+      # デフォルトゲートウェイ指定
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref KosmischInternetGateway
+  # subnetにRoute tableを紐づける
+  SubnetPublicRouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref KosmischPublicRouteTable
+      SubnetId: !Ref KosmischSubnet1
+  SubnetPublicRouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref KosmischPublicRouteTable
+      SubnetId: !Ref KosmischSubnet2
+  # セキュリティグループ
+  KosmischSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: KOSMISCHSG
+      VpcId: !Ref KosmischVPC
+      Tags:
+        - Key: 'Name'
+          Value: 'KOSMISCHSG'
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+  SimpleConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !FindInMap [ StackConfig, EC2, ImageId ]
+      SecurityGroups:
+        - Ref: KosmischSecurityGroup
+      InstanceType: t2.micro
+  KosmischServerGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - 'ap-northeast-1a'
+        - 'ap-northeast-1c'
+      LaunchConfigurationName:
+        Ref: SimpleConfig
+      MinSize: '1'
+      MaxSize: '1'
+      TargetGroupARNs:
+        - Ref: KosmischTargetGroup
+      VPCZoneIdentifier:
+        - Ref: KosmischSubnet1
+        - Ref: KosmischSubnet2
+  KosmischLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Name: KosmischLB
+      Type: 'application'
+      SecurityGroups: 
+        - Ref: KosmischSecurityGroup
+      Subnets: 
+        - !Ref KosmischSubnet1
+        - !Ref KosmischSubnet2
+  KosmischTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: KosmischLBGroup
+      VpcId: !Ref KosmischVPC
+      # HealthCheck
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: '/'
+      HealthCheckPort: '80'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: '200'
+      # Routing
+      Port: '80'
+      Protocol: HTTP
+      TargetType: 'instance'
+      TargetGroupAttributes:
+        # ターゲットの登録解除までの待機時間
+        - Key: 'deregistration_delay.timeout_seconds'
+          Value: 300
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      # Certificates: !Ref ACMArn
+      DefaultActions:
+        - Type: 'forward'
+          TargetGroupArn: !Ref KosmischTargetGroup
+      LoadBalancerArn: !Ref KosmischLB
+      Port: '80'
+      Protocol: 'HTTP'
